@@ -40,6 +40,7 @@ export interface ResponseElements {
 
 export interface UnauthorizedApiCallElements {
     instancesSet: InstancesSet;
+    securityGroup: string
 }
 
 export interface SuspiciousLoginElements {

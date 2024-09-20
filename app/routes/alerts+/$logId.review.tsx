@@ -52,11 +52,10 @@ export default function Review() {
     >
       <Drawer.Header
         title={alertSummary.alert_name}
-        subTitle={displayedLog.timestamp}
+        subTitle={displayedLog.event_name}
       />
       <div id="drawer-body" className="grow justify-between">
-        <div id="log-details" className="grid grid-cols-4 gap-4">
-          <Card title="hi" value="you!" />
+        <div id="log-details" className="grid grid-rows-3 gap-2">
           <Card title="hi" value="you!" />
           <Card title="hi" value="you!" />
           <Card title="hi" value="you!" />

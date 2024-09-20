@@ -39,11 +39,11 @@ export async function loader({
 export default function AlertsPage() {
   return (
     <>
-      <div className="flex flex-col justify-content h-screen w-screen text-gray-900">
+      <div className="bg-gradient-to-b from-amber-50 to-amber-100 flex flex-col justify-content h-screen w-screen text-gray-900">
         <div className="p-6">
           <AlertSelector />
         </div>
-        <div className="grow w-full ">
+        <div className="grow w-2/3 ">
           <AlertsTable />
         </div>
       </div>

@@ -58,7 +58,7 @@ export function AlertsTable() {
   }, [alertSummary.alert_name]);
 
   return (
-    <div className="relative h-full w-full  bg-gradient-to-b from-amber-50 to-amber-200 p-8  items-center justify-center grow">
+    <div className="relative h-full w-full   p-8  items-center justify-center grow">
       <ResizableTableContainer className="w-full h-full overflow-auto relative bg-white rounded-lg shadow text-gray-600">
         <Table
           aria-label="Stocks"
@@ -91,23 +91,27 @@ export function AlertsTable() {
           selectedKeys={selectedLogs}
         >
           <TableHeader>
-            <_Column defaultWidth={275} id="time" allowsSorting>
+            <_Column defaultWidth={200} id="time" allowsSorting>
               Time
             </_Column>
             <_Column id="event" isRowHeader allowsSorting>
               Event
             </_Column>
-            <_Column id="source_ip" defaultWidth={200} allowsSorting>
+            <_Column id="source_ip" defaultWidth={150} allowsSorting>
               Source IP
             </_Column>
-            <_Column id="user_type" defaultWidth={200} allowsSorting>
+            <_Column id="user_type" defaultWidth={100} allowsSorting>
               Identity type
             </_Column>
-            <_Column id="user_name" defaultWidth={200} allowsSorting>
+            <_Column id="user_name" defaultWidth={100} allowsSorting>
               User name
             </_Column>
           </TableHeader>
-          <TableBody items={sortedItems}>
+          <TableBody
+            className="data-[empty]:text-center data-[empty]:italic"
+            renderEmptyState={() => "Select an alert to view."}
+            items={sortedItems}
+          >
             {(item) => (
               <_Row
                 key={item.timestamp}
@@ -119,7 +123,9 @@ export function AlertsTable() {
                   });
                 }}
               >
-                <_Cell>{dayJs(item.timestamp).format("MM/DD/YYYY HH:mm:ss")}</_Cell>
+                <_Cell>
+                  {dayJs(item.timestamp).format("MM/DD/YYYY HH:mm:ss")}
+                </_Cell>
                 <_Cell className="font-semibold">{item.event_name}</_Cell>
                 <_Cell>{item.source_ip}</_Cell>
                 <_Cell>{item.user_identity.type}</_Cell>
