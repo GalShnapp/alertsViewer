@@ -64,3 +64,7 @@ export const enumAlertType = {
 };
 
 export type AlertType = (typeof enumAlertType)[keyof typeof enumAlertType];
+
+export interface IdentifiedCloudTrailLogs extends CloudTrailLog{
+    id: number
+}

@@ -4,6 +4,7 @@ import { LOGS_API_URL } from "../consts";
 import { AlertSelector } from "../../components/select";
 import { AlertSummary } from "../logs.interface";
 import { AlertsTable } from "../../components/table";
+import { NerativeTable } from "~/components/nerativeTable";
 
 export const meta: MetaFunction = () => {
   return [
@@ -43,8 +44,13 @@ export default function AlertsPage() {
         <div className="p-6">
           <AlertSelector />
         </div>
-        <div className="grow w-2/3 ">
-          <AlertsTable />
+        <div className="grow flex flex-row">
+          <div className="w-2/3">
+            <AlertsTable />
+          </div>
+          <div className="w-1/3">
+            <NerativeTable />
+          </div>
         </div>
       </div>
       <Outlet />

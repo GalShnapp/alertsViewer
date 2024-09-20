@@ -10,62 +10,59 @@ import {
   TableHeader,
   Selection,
   useDragAndDrop,
-  Button,
+  isTextDropItem,
 } from "react-aria-components";
 import type {
   CellProps,
   ColumnProps,
   Key,
   RowProps,
-  SortDescriptor,
 } from "react-aria-components";
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useLoaderData, useSearchParams } from "@remix-run/react";
-import { loader } from "../routes/alerts+/_layout";
+import { useState } from "react";
+import { useSearchParams } from "@remix-run/react";
 import dayJs from "dayjs";
+import { IdentifiedCloudTrailLogs } from "~/routes/logs.interface";
 
-export function AlertsTable() {
-  const alertSummary = useLoaderData<typeof loader>();
-  const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [selectedLogs, setSelectedLogs] = useState<Selection>(new Set());
-  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-    column: "time",
-    direction: "ascending",
-  });
 
-  let sortedItems = useMemo(() => {
-    return alertSummary.cloudtrail_logs
-      ?.map((log, index) => {
-        return {
-          id: index,
-          ...log,
-        };
-      })
-      .sort((a, b) => {
-        if (sortDescriptor.column === undefined) {
-          return 0;
-        }
-        return 1; //TODO: Implement sorting
-      });
-  }, [sortDescriptor, alertSummary]);
 
-  useEffect(() => {
-    setSelectedLogs(new Set());
-  }, [alertSummary.alert_name]);
+export function NerativeTable() {
+  let [items, setItems] = useState<IdentifiedCloudTrailLogs[]>([]);
+  let [searchParams, _ ] = useSearchParams()
+
+  const alertId = searchParams.get('alert')
 
   let { dragAndDropHooks } = useDragAndDrop({
-    getItems: (keys) => {
-      return [...keys].map((key) => 
-      {
-        const item = sortedItems.find((item) => item.id === key)!;
-        return {
-          "text/plain": `${item.timestamp}-${item.event_name}`,
-          "text/html": `<strong>${item.timestamp}</strong> - <strong>${item.event_name}</strong>`,
-          'log': JSON.stringify(item)
-        };  
-      }
+    async onRootDrop(e) {
+      let newItems = await Promise.all(
+        e.items
+          .filter(isTextDropItem)
+          .map(async (item) => JSON.parse(await item.getText("log")))
       );
+      setItems(newItems);
+    },
+    getItems: (keys) =>
+      [...keys].map((key) => ({
+        "text/plain": items.find((item) => item.id === key)?.event_name ?? "",
+      })),
+      async onInsert(e) {
+        
+
+      let newItems = await Promise.all(
+        e.items
+          .filter(isTextDropItem)
+          .map(async (item) => JSON.parse(await item.getText("log")))
+          .filter(item => !(item.id in items.map(i => i.id)))
+      );
+      
+      if (e.target.dropPosition === "before") {
+        const b4 = items.slice(0, e.target.key as number)
+        const after = items.slice(e.target.key as number)
+        setItems([...b4, ...newItems, ...after])
+      } else if (e.target.dropPosition === "after") {
+        const b4 = items.slice(0, e.target.key as number + 1);
+        const after = items.slice(e.target.key as number + 1);
+        setItems([...b4, ...newItems, ...after]);
+      }
     },
   });
 
@@ -73,69 +70,30 @@ export function AlertsTable() {
     <div className="relative h-full w-full   p-8  items-center justify-center grow">
       <ResizableTableContainer className="w-full h-full overflow-auto relative bg-white rounded-lg shadow text-gray-600">
         <Table
-          aria-label="Stocks"
-          selectionMode="single"
-          selectionBehavior="replace"
-          sortDescriptor={sortDescriptor}
-          onSortChange={setSortDescriptor}
+          aria-label="Nerative"
           className="border-separate border-spacing-0"
           dragAndDropHooks={dragAndDropHooks}
-          onSelectionChange={(selection) => {
-            if (selection === "all") {
-              return;
-            }
-            if (selection.size === 0) {
-              setSelectedLogs(new Set());
-              return;
-            }
-
-            setSelectedLogs(selection);
-          }}
-          selectedKeys={selectedLogs}
+          disabledBehavior="selection"
         >
           <TableHeader>
-            <_Column defaultWidth={200} id="time" allowsSorting>
-              Time
-            </_Column>
-            <_Column id="event" isRowHeader allowsSorting>
+            <_Column id="time">Time</_Column>
+            <_Column id="event" isRowHeader>
               Event
             </_Column>
-            <_Column id="source_ip" defaultWidth={150} allowsSorting>
-              Source IP
-            </_Column>
-            <_Column id="user_type" defaultWidth={100} allowsSorting>
-              Identity type
-            </_Column>
-            <_Column id="user_name" defaultWidth={100} allowsSorting>
-              User name
-            </_Column>
+            <_Column id="source_ip">Source IP</_Column>
           </TableHeader>
           <TableBody
             className="data-[empty]:text-center data-[empty]:italic"
             renderEmptyState={() => "Select an alert to view."}
-            items={sortedItems}
+            items={items}
           >
             {(item) => (
-              <_Row
-                key={item.timestamp}
-                id={item.id as Key}
-                onAction={() => {
-                  navigate({
-                    pathname: `${item.id}/review`,
-                    search: searchParams.toString(),
-                  });
-                }}
-              >
+              <_Row key={item.timestamp} id={item.id as Key}>
                 <_Cell>
-                  
-                    <Button slot="drag" className="px-1"> ≡ </Button>
-                    {dayJs(item.timestamp).format("MM/DD/YYYY HH:mm:ss")}
-                  
+                  {dayJs(item.timestamp).format("MM/DD/YYYY HH:mm:ss")}
                 </_Cell>
                 <_Cell className="font-semibold">{item.event_name}</_Cell>
                 <_Cell>{item.source_ip}</_Cell>
-                <_Cell>{item.user_identity.type}</_Cell>
-                <_Cell>{item.user_identity.userName}</_Cell>
               </_Row>
             )}
           </TableBody>
