@@ -7,6 +7,7 @@ export interface CloudTrailLog {
     timestamp: string;
     event_name: string;
     user_identity: UserIdentity;
+    source_ip: string;
     metadata: ResponseElements | RequestParameters;
 }
 
@@ -42,7 +43,6 @@ export interface UnauthorizedApiCallElements {
 }
 
 export interface SuspiciousLoginElements {
-    securityGroup: string;
     ConsoleLogin: string;
 }
 
