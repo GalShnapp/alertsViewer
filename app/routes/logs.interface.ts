@@ -1,6 +1,6 @@
 export interface AlertSummary {
     alert_name: string;
-    cloudtrail_logs: CloudTrailLog[];
+    cloudtrail_logs: IdentifiedCloudTrailLogs[];
 }
 
 export interface CloudTrailLog {

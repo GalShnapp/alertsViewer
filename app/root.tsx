@@ -5,6 +5,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { Text } from "react-aria-components";
 import type { LinksFunction } from "@remix-run/node";
 
 import "./tailwind.css";
@@ -31,10 +32,21 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
-        {children}
-        <ScrollRestoration />
-        <Scripts />
+      <body className="min-h-full m-0 h-screen flex flex-col">
+        <header className="flex-0">
+          <nav>
+            <div className="h-16 bg-amber-300 content-center">
+              <Text className="subpixel-antialiased antialiased px-4 text-4xl font-bold text-gray-50">
+                Alerts view
+              </Text>
+            </div>
+          </nav>
+        </header>
+        <main className="flex-auto overflow-y-scroll">
+          {children}
+          <ScrollRestoration />
+          <Scripts />
+        </main>
       </body>
     </html>
   );

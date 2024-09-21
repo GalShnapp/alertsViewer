@@ -8,9 +8,9 @@ import {
   Table,
   TableBody,
   TableHeader,
-  Selection,
   useDragAndDrop,
   isTextDropItem,
+  DropIndicator,
 } from "react-aria-components";
 import type {
   CellProps,
@@ -19,17 +19,15 @@ import type {
   RowProps,
 } from "react-aria-components";
 import { useState } from "react";
-import { useSearchParams } from "@remix-run/react";
 import dayJs from "dayjs";
 import { IdentifiedCloudTrailLogs } from "~/routes/logs.interface";
+import { NerativeContext } from "~/contexts/nerative.context";
+import { useContext } from "react";
 
-
-
+//TODO: add remove button and
 export function NerativeTable() {
-  let [items, setItems] = useState<IdentifiedCloudTrailLogs[]>([]);
-  let [searchParams, _ ] = useSearchParams()
+  let { items: items, setItems: setItems } = useContext(NerativeContext);
 
-  const alertId = searchParams.get('alert')
 
   let { dragAndDropHooks } = useDragAndDrop({
     async onRootDrop(e) {
@@ -38,31 +36,75 @@ export function NerativeTable() {
           .filter(isTextDropItem)
           .map(async (item) => JSON.parse(await item.getText("log")))
       );
+
+      if (items.map((item) => item.id).includes(newItems[0].id)) {
+        return;
+      }
       setItems(newItems);
     },
-    getItems: (keys) =>
-      [...keys].map((key) => ({
+    getItems(keys) {
+      return [...keys].map((key) => ({
         "text/plain": items.find((item) => item.id === key)?.event_name ?? "",
-      })),
-      async onInsert(e) {
-        
-
+      }));
+    },
+    async onInsert(e) {
       let newItems = await Promise.all(
         e.items
           .filter(isTextDropItem)
           .map(async (item) => JSON.parse(await item.getText("log")))
-          .filter(item => !(item.id in items.map(i => i.id)))
       );
-      
-      if (e.target.dropPosition === "before") {
-        const b4 = items.slice(0, e.target.key as number)
-        const after = items.slice(e.target.key as number)
-        setItems([...b4, ...newItems, ...after])
-      } else if (e.target.dropPosition === "after") {
-        const b4 = items.slice(0, e.target.key as number + 1);
-        const after = items.slice(e.target.key as number + 1);
-        setItems([...b4, ...newItems, ...after]);
+
+      if (items.map((item) => item.id).includes(newItems[0].id)) {
+        return;
       }
+
+      let b4: IdentifiedCloudTrailLogs[] = [];
+      let after: IdentifiedCloudTrailLogs[] = [];
+      const targetIndex = items.findIndex((item) => item.id === e.target.key);
+      if (
+        e.target.dropPosition === "before" ||
+        e.target.dropPosition === "on"
+      ) {
+        b4 = items.slice(0, targetIndex);
+        after = items.slice(targetIndex);
+      } else if (e.target.dropPosition === "after") {
+        b4 = items.slice(0, targetIndex + 1);
+        after = items.slice(targetIndex + 1);
+      }
+      setItems([...b4, ...newItems, ...after]);
+    },
+    onReorder(e) {
+      const targetIndex = items.findIndex((item) => item.id === e.target.key);
+      const movedItems = items.filter((item) => e.keys.has(item.id));
+      const stationedItems = items.filter((item) => !e.keys.has(item.id));
+
+      let b4: IdentifiedCloudTrailLogs[] = [];
+      let after: IdentifiedCloudTrailLogs[] = [];
+      if (e.target.dropPosition === "before") {
+        b4 = stationedItems.slice(0, targetIndex);
+        after = stationedItems.slice(targetIndex);
+      } else if (e.target.dropPosition === "after") {
+        b4 = stationedItems.slice(0, targetIndex + 1);
+        after = stationedItems.slice(targetIndex + 1);
+      }
+      setItems([...b4, ...movedItems, ...after]);
+    },
+    renderDropIndicator(target) {
+      return (
+        <DropIndicator
+          target={target}
+          className={({ isDropTarget }) =>
+            isDropTarget ? "outline outline-1 outline-pink-500" : ""
+          }
+        />
+      );
+    },
+    renderDragPreview(items) {
+      return (
+        <div className="drag-preview">
+          <pre>{items[0]["text/plain"]}</pre>
+        </div>
+      );
     },
   });
 
@@ -84,7 +126,11 @@ export function NerativeTable() {
           </TableHeader>
           <TableBody
             className="data-[empty]:text-center data-[empty]:italic"
-            renderEmptyState={() => "Select an alert to view."}
+            renderEmptyState={() => (
+              <div className="flex items-center justify-center h-96 text-gray-400">
+                Drag or add alerts here to tell a story.
+              </div>
+            )}
             items={items}
           >
             {(item) => (
