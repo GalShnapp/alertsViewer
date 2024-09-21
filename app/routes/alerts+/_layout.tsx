@@ -12,6 +12,7 @@ import { NerativeTable } from "~/components/nerativeTable";
 import {
   Key,
   ResizableTableContainer,
+  SortDescriptor,
   Table,
   TableBody,
   useDragAndDrop,
@@ -24,12 +25,13 @@ import {
 } from "~/components/tableTemplate";
 import dayJs from "dayjs";
 import { NerativeContext } from "~/contexts/nerative.context";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { s } from "framer-motion/client";
 
 export const meta: MetaFunction = () => {
   return [
     { title: "Alerts" },
-    { name: "description", content: "Welcome to Remix!" },
+    { name: "description", content: "a fantastic alerts explorer" },
   ];
 };
 
@@ -124,6 +126,11 @@ export async function loader({
   }
 }
 
+interface MySortDescriptor extends SortDescriptor {
+  column: "time" | "event" | "source_ip" | "user_type" | "user_name";
+  direction: "ascending" | "descending";
+}
+
 export default function AlertsPage() {
   const [searchParams] = useSearchParams();
   const [nerativeItems, setNerativeItems] = useState<IdentifiedCloudTrailLogs[]>([]);
@@ -159,6 +166,42 @@ export default function AlertsPage() {
     },
   });
 
+  let [sortDescriptor, setSortDescriptor] = useState<MySortDescriptor>({
+    column: "time",
+    direction: "ascending",
+  });
+
+  let sortedItems = useMemo(() => {
+    return alerts.cloudtrail_logs.sort((a, b) => {
+      let cmp = 0;
+      switch (sortDescriptor.column) {
+        case "time":
+          cmp = dayJs(a.timestamp).unix() - dayJs(b.timestamp).unix();
+          break;
+        case "event":
+          cmp = a.event_name.localeCompare(b.event_name);
+          break;
+        case "source_ip":
+          cmp = a.source_ip.localeCompare(b.source_ip);
+          break;
+        case "user_type":
+          cmp = a.user_identity.type.localeCompare(b.user_identity.type);
+          break;
+        case "user_name":
+          cmp = a.user_identity.userName.localeCompare(
+            b.user_identity.userName
+          );
+          break;
+      }
+
+      if (sortDescriptor.direction === "descending") {
+        cmp *= -1;
+      }
+
+      return cmp;
+    });
+  }, [sortDescriptor, alerts.cloudtrail_logs]);
+
   return (
     <NerativeContext.Provider
       value={{
@@ -180,6 +223,13 @@ export default function AlertsPage() {
                   selectionBehavior="replace"
                   className="border-separate border-spacing-0"
                   dragAndDropHooks={alertsListDragHooks}
+                  sortDescriptor={sortDescriptor}
+                  onSortChange={(desc) => {
+                    setSortDescriptor({
+                      column: desc.column as MySortDescriptor["column"],
+                      direction: desc.direction ?? "ascending",
+                    });
+                  }}
                 >
                   <MyTableHeader>
                     <MyColumn
@@ -225,7 +275,7 @@ export default function AlertsPage() {
                         Select an alert to view.
                       </div>
                     )}
-                    items={alerts.cloudtrail_logs}
+                    items={sortedItems}
                   >
                     {(item) => (
                       <MyRow

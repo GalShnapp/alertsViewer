@@ -13,6 +13,7 @@ import {
   Button,
   CellProps,
 } from "react-aria-components";
+import { GoArrowDown } from "react-icons/go";
 import clsx from "clsx";
 
 export function MyColumn(props: ColumnProps & { children: React.ReactNode }) {
@@ -20,7 +21,7 @@ export function MyColumn(props: ColumnProps & { children: React.ReactNode }) {
     <Column
       {...props}
       className={clsx(
-        "sticky top-0 p-0 border-0 border-b border-solid border-slate-300 bg-slate-200 font-bold text-left cursor-default first:rounded-tl-lg last:rounded-tr-lg whitespace-nowrap outline-none",
+        "sticky top-0 p-0 border-0 border-b border-solid border-slate-300 bg-slate-200 font-bold text-left cursor-default first:rounded-tl-lg last:rounded-tr-lg whitespace-nowrap outline-none"
       )}
     >
       {({ allowsSorting, sortDirection }) => (
@@ -31,9 +32,13 @@ export function MyColumn(props: ColumnProps & { children: React.ReactNode }) {
             className="flex flex-1 items-center overflow-hidden outline-none rounded focus-visible:ring-2 ring-slate-600"
           >
             <span className="flex-1 truncate">{props.children}</span>
-            {allowsSorting && (
-              <span className={`ml-1 w-4 h-4 flex items-center justify-center`}>
-                {sortDirection === "ascending" ? "▲" : "▼"}
+            {allowsSorting && sortDirection && (
+              <span
+                className={`ml-1 w-4 h-4 flex items-center justify-center ${
+                  sortDirection === "ascending" ? "rotate-180" : ""
+                }`}
+              >
+                <GoArrowDown />
               </span>
             )}
           </Group>
@@ -51,9 +56,7 @@ export function MyTableHeader<T extends object>({
   let { allowsDragging } = useTableOptions();
 
   return (
-    <TableHeader
-    className="relative w-full"
-    >
+    <TableHeader className="relative w-full">
       {/* Add extra columns for drag and drop and selection. */}
       {allowsDragging && <MyColumn defaultWidth={0}>{""}</MyColumn>}
       <Collection items={columns}>{children}</Collection>
