@@ -126,7 +126,7 @@ export async function loader({
 
 export default function AlertsPage() {
   const [searchParams] = useSearchParams();
-  const [items, setItems] = useState<IdentifiedCloudTrailLogs[]>([]);
+  const [nerativeItems, setNerativeItems] = useState<IdentifiedCloudTrailLogs[]>([]);
   const alerts = useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
@@ -159,12 +159,11 @@ export default function AlertsPage() {
     },
   });
 
-  console.log(items);
   return (
     <NerativeContext.Provider
       value={{
-        items: items,
-        setItems: setItems,
+        items: nerativeItems,
+        setItems: setNerativeItems,
       }}
     >
       <div className="bg-gradient-to-b from-amber-50 to-amber-100 flex flex-col justify-content relative h-full w-full text-gray-900">
@@ -255,8 +254,8 @@ export default function AlertsPage() {
       </div>
       <Outlet
         context={{
-          items: items,
-          setItems: setItems,
+          items: nerativeItems,
+          setItems: setNerativeItems,
         }}
       />
     </NerativeContext.Provider>

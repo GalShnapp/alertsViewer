@@ -339,7 +339,6 @@ export default function Review() {
                               .map((item) => item.id)
                               .includes(item.id)}
                             onPress={() => {
-                              console.log("adding item", item);
                               setState(!state);
                               ctx.setItems([...ctx.items, item]);
                             }}
@@ -496,6 +495,7 @@ export default function Review() {
               if (ctx.items.map((item) => item.id).includes(displayedLog.id)) {
                 return;
               }
+
               ctx.setItems([...ctx.items, displayedLog]);
               navigate(-1);
             }}

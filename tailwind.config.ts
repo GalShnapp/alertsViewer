@@ -21,4 +21,7 @@ export default {
   plugins: [
     require('tailwindcss-react-aria-components')
   ],
+  variants: {
+    backgroundColor: ['responsive', 'hover', 'active', 'disabled', 'even', 'odd', 'focus',],
+  },
 } satisfies Config;

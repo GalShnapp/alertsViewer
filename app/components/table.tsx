@@ -26,7 +26,6 @@ import dayJs from "dayjs";
 
 export function AlertsTable() {
   const alertSummary = useLoaderData<typeof loader>();
-  console.log(alertSummary);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedLogs, setSelectedLogs] = useState<Selection>(new Set());

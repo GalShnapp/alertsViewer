@@ -1,15 +1,3 @@
-import {
-  Button,
-  ComboBox,
-  FieldError,
-  Input,
-  Label,
-  ListBox,
-  ListBoxItem,
-  Popover,
-  Section,
-  Text,
-} from "react-aria-components";
 import { useSearchParams } from "@remix-run/react";
 import React from "react";
 import { enumAlertType } from "../routes/logs.interface";
@@ -35,6 +23,7 @@ export function AlertSelector() {
         setSelectedAlert(value);
         setSearchParams({ alert: value });
       }}
+      inputValue={selectedAlert}
     >
       {options.map(({ id, name }) => (
         <MyComboBox.Item key={id} id={id} value={{ id, name }}>
