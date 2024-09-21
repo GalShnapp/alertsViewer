@@ -221,7 +221,11 @@ export default function AlertsPage() {
                   </MyTableHeader>
                   <TableBody
                     className="data-[empty]:text-center data-[empty]:italic"
-                    renderEmptyState={() => "Select an alert to view."}
+                    renderEmptyState={() => (
+                      <div className="m-8 flex items-center justify-center h-max text-gray-400">
+                        Select an alert to view.
+                      </div>
+                    )}
                     items={alerts.cloudtrail_logs}
                   >
                     {(item) => (

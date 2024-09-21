@@ -109,7 +109,7 @@ export function NerativeTable() {
   });
 
   return (
-    <div className="relative h-full w-full   p-8  items-center justify-center grow">
+    <div className="relative h-full w-full p-8 items-center justify-center grow">
       <ResizableTableContainer className="w-full h-full overflow-auto relative bg-white rounded-lg shadow text-gray-600">
         <Table
           aria-label="Nerative"
@@ -127,14 +127,18 @@ export function NerativeTable() {
           <TableBody
             className="data-[empty]:text-center data-[empty]:italic"
             renderEmptyState={() => (
-              <div className="flex items-center justify-center h-96 text-gray-400">
+              <div className="m-8 flex items-center justify-center h-max text-gray-400">
                 Drag or add alerts here to tell a story.
               </div>
             )}
             items={items}
           >
             {(item) => (
-              <_Row key={item.timestamp} id={item.id as Key}>
+              <_Row key={item.timestamp} id={item.id as Key} onAction={
+                () => {
+                  setItems(items.filter((i) => i.id !== item.id));
+                }
+              }>
                 <_Cell>
                   {dayJs(item.timestamp).format("MM/DD/YYYY HH:mm:ss")}
                 </_Cell>

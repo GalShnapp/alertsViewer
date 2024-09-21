@@ -1,10 +1,10 @@
 import { Text } from "react-aria-components";
 
-export function Card({title, value}:{title: string, value: string}) {
+export function Card({title, children}:{title: string | undefined, children?: React.ReactNode}) {
     return (
-      <div className="shadow m-6 flex flex-row gap-2 px-2 ">
-        <Text className="flex-col text-gray-500">{title}</Text>
-        <Text className="flex-col font-bold">{value}</Text>
+      <div className="my-4">
+        <Text className="text-gray-500 mx-6">{title}</Text>
+        {children}
       </div>
     );
 }
