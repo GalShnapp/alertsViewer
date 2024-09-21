@@ -1,5 +1,5 @@
 # Welcome to Alerts view
-An alert viewing app built using react, remix, react-aria-components and tailwindCss.
+An alert viewing app that helps you wrap your head around what's your cluster doing, built using react, remix, react-aria-components and tailwindCss.
 <br>
 <br>
 To start exploring your alerts:
