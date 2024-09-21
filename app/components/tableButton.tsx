@@ -17,7 +17,7 @@ export function TableButton({
   return (
     <TooltipTrigger closeDelay={0} delay={200}>
       <Button
-        className="min-w-8 flex-col bg-teal-400 text-gray-100 rounded-md disabled:bg-gray-400 disabled:text-gray-200"
+        className="min-w-8 flex-col bg-teal-400 text-gray-100 px-2 rounded-md disabled:bg-gray-400 disabled:text-gray-200"
         {...props}
       >
         {buttonText}

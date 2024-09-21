@@ -499,7 +499,7 @@ export default function Review() {
               ctx.setItems([...ctx.items, displayedLog]);
               navigate(-1);
             }}
-            className="bg-blue-300 rounded-md min-w-16 px-2 py-1 disabled:bg-gray-300"
+            className="min-w-8 flex-col bg-teal-400 py-1 px-2 text-gray-100 rounded-md disabled:bg-gray-400 disabled:text-gray-200"
             isDisabled={ctx.items
               .map((item) => item.id)
               .includes(displayedLog.id)}
